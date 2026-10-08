@@ -3,21 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Truck Break-Even & Profit Calculator</title>
+  <title>Food Truck Daily Break-Even & Profit Calculator</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --card-border: #334155;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-amber: #f59e0b;
-      --accent-orange: #ea580c;
-      --accent-emerald: #10b981;
-      --accent-rose: #f43f5e;
-      --accent-cyan: #06b6d4;
-      --input-bg: #0f172a;
-      --input-border: #475569;
+      --bg-gradient: radial-gradient(circle at 50% 10%, #172554 0%, #0b1329 45%, #050811 100%);
+      --surface-glass: rgba(18, 26, 47, 0.78);
+      --surface-inner: rgba(11, 19, 36, 0.7);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-highlight: rgba(255, 255, 255, 0.16);
+      
+      --amber-400: #fbbf24;
+      --amber-500: #f59e0b;
+      --emerald-400: #34d399;
+      --emerald-500: #10b981;
+      --cyan-400: #38bdf8;
+      --rose-400: #fb7185;
+      
+      --text-100: #f8fafc;
+      --text-300: #cbd5e1;
+      --text-400: #94a3b8;
+      --text-500: #64748b;
+      
+      --input-bg: rgba(6, 11, 23, 0.85);
+      --input-border: rgba(255, 255, 255, 0.12);
       --input-focus: #f59e0b;
     }
 
@@ -27,198 +35,292 @@
       padding: 0;
     }
 
+    html, body {
+      height: 100%;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      line-height: 1.5;
-      padding: 24px 16px 60px;
-    }
-
-    .container {
-      max-width: 1040px;
-      margin: 0 auto;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .badge-icon {
-      display: inline-flex;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-100);
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 6px;
-      background: rgba(245, 158, 11, 0.12);
-      color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.25);
-      border-radius: 9999px;
-      padding: 4px 14px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      text-transform: uppercase;
+      padding: 12px 14px;
+      overflow-x: hidden;
     }
 
-    h1 {
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
+    /* Keep entire app visible on standard desktop screens without scrolling */
+    .app-wrapper {
+      width: 100%;
+      max-width: 1020px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: auto;
     }
 
-    .subtitle {
-      font-size: clamp(0.95rem, 2vw, 1.1rem);
-      color: var(--text-muted);
-      max-width: 620px;
-      margin: 0 auto;
-    }
-
-    /* Preset Toolbar */
-    .presets-container {
+    /* Compact Header */
+    header {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: space-between;
+      gap: 8px 16px;
+      padding: 2px 4px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      display: flex;
+      align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 24px;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+      flex-shrink: 0;
     }
 
-    .presets-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-right: 4px;
+    .brand-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
     }
 
-    .preset-btn {
-      background: rgba(51, 65, 85, 0.7);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
+    .header-text h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .header-text p {
+      font-size: 0.8rem;
+      color: var(--text-400);
+    }
+
+    /* Preset Toolbar */
+    .preset-strip {
+      display: flex;
       align-items: center;
       gap: 6px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 3px 6px;
     }
 
-    .preset-btn:hover {
-      background: #334155;
-      border-color: var(--accent-amber);
-      transform: translateY(-1px);
+    .preset-label {
+      font-size: 0.72rem;
+      color: var(--text-500);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 4px;
     }
 
-    .preset-btn.reset-btn {
-      color: var(--text-muted);
-      background: transparent;
-      border: 1px dashed var(--input-border);
+    .preset-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid transparent;
+      color: var(--text-300);
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .preset-btn.reset-btn:hover {
-      color: var(--accent-rose);
-      border-color: var(--accent-rose);
+    .preset-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    /* Main Dashboard Layout */
-    .grid-layout {
+    .preset-pill.active {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: var(--amber-500);
+      color: var(--amber-400);
+    }
+
+    .preset-pill.reset-pill {
+      color: var(--text-500);
+    }
+
+    .preset-pill.reset-pill:hover {
+      background: rgba(251, 113, 133, 0.12);
+      border-color: var(--rose-400);
+      color: var(--rose-400);
+    }
+
+    /* Alert Banner (Compact & Non-intrusive) */
+    .alert-banner {
+      display: none;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      animation: slideDown 0.2s ease-out;
+    }
+
+    .alert-banner.error {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+    }
+
+    .alert-banner.warning {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fde68a;
+    }
+
+    .alert-banner strong {
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    /* Main Central Hub */
+    .central-hub {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 24px;
+      gap: 12px;
     }
 
-    @media (min-width: 860px) {
-      .grid-layout {
-        grid-template-columns: 1.05fr 1fr;
+    @media (min-width: 820px) {
+      .central-hub {
+        grid-template-columns: 1fr 1.08fr;
       }
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+    .panel {
+      background: var(--surface-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    .card-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #fff;
+    .panel-header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 12px;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
-    /* Form Inputs */
-    .form-group {
-      margin-bottom: 16px;
+    .panel-header h2 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-300);
+      display: flex;
+      align-items: center;
+      gap: 7px;
     }
 
-    .form-group:last-child {
-      margin-bottom: 0;
+    .panel-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-400);
+      border: 1px solid var(--border-subtle);
+      letter-spacing: 0.4px;
     }
 
-    .label-row {
+    /* Left Panel: Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px 12px;
+    }
+
+    .input-card {
+      background: var(--surface-inner);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 10px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .input-card:focus-within {
+      border-color: var(--amber-500);
+      background: rgba(15, 23, 42, 0.95);
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    }
+
+    .input-label-row {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 6px;
+      align-items: center;
+      margin-bottom: 4px;
     }
 
-    label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #e2e8f0;
+    .input-label-row label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-300);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
-    .hint {
-      font-size: 0.75rem;
-      color: var(--text-muted);
+    .input-badge {
+      font-size: 0.65rem;
+      color: var(--text-500);
     }
 
-    .input-wrapper {
-      position: relative;
+    .input-control {
       display: flex;
       align-items: center;
+      position: relative;
     }
 
     .input-prefix {
-      position: absolute;
-      left: 12px;
-      color: var(--text-muted);
-      font-weight: 600;
-      pointer-events: none;
+      color: var(--amber-500);
+      font-weight: 700;
       font-size: 0.95rem;
+      margin-right: 4px;
     }
 
     .input-suffix {
-      position: absolute;
-      right: 12px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      pointer-events: none;
+      color: var(--text-500);
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-left: 4px;
     }
 
     input[type="number"] {
       width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      color: var(--text-main);
-      font-size: 1rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 1.12rem;
+      font-weight: 800;
       outline: none;
+      font-family: inherit;
       -moz-appearance: textfield;
       appearance: textfield;
     }
@@ -229,239 +331,246 @@
       margin: 0;
     }
 
-    input.has-prefix {
-      padding-left: 28px;
-    }
-
-    input.has-suffix {
-      padding-right: 50px;
-    }
-
-    input[type="number"]:focus {
-      border-color: var(--input-focus);
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
-    }
-
-    .two-cols {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    /* Friendly Alert / Error Message */
-    .alert {
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 20px;
-      display: none;
-      font-size: 0.9rem;
-      line-height: 1.45;
-      animation: fadeIn 0.25s ease;
-    }
-
-    .alert-error {
-      background: rgba(244, 63, 94, 0.12);
-      border: 1px solid rgba(244, 63, 94, 0.35);
-      color: #fecdd3;
-    }
-
-    .alert-error strong {
-      color: #ff8499;
+    .input-subtext {
+      font-size: 0.67rem;
+      color: var(--text-500);
+      margin-top: 3px;
       display: block;
-      margin-bottom: 4px;
-      font-weight: 700;
-    }
-
-    .alert-warning {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      color: #fef3c7;
-    }
-
-    .alert-warning strong {
-      color: #fcd34d;
-      display: block;
-      margin-bottom: 4px;
-      font-weight: 700;
-    }
-
-    /* Results Side */
-    .results-hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .hero-stat-card {
-      background: linear-gradient(145deg, #182338, #111a2c);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-      position: relative;
+      white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .hero-stat-card.break-even {
-      border-top: 3px solid var(--accent-amber);
-    }
-
-    .hero-stat-card.target-profit {
-      border-top: 3px solid var(--accent-emerald);
-    }
-
-    .stat-label {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-
-    .stat-number {
-      font-size: clamp(2rem, 3.5vw, 2.5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      color: #ffffff;
-    }
-
-    .stat-number.amber {
-      color: var(--accent-amber);
-    }
-
-    .stat-number.emerald {
-      color: var(--accent-emerald);
-    }
-
-    .stat-unit {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-top: 4px;
-    }
-
-    /* Pace Pill */
-    .pace-banner {
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(6, 182, 212, 0.25);
-      border-radius: 10px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-
-    .pace-text {
-      font-size: 0.88rem;
-      color: #e0f2fe;
-    }
-
-    .pace-highlight {
-      font-weight: 700;
-      color: #38bdf8;
-      font-size: 1.05rem;
-    }
-
-    /* Metrics Breakdown Table */
-    .metrics-list {
+    /* Right Panel: Results Hub */
+    .results-stack {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 20px;
     }
 
-    .metric-item {
+    /* Hero Dual KPI Cards */
+    .hero-kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .kpi-card {
+      background: var(--surface-inner);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px 14px;
+      position: relative;
+      overflow: hidden;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 0.88rem;
+      flex-direction: column;
+      justify-content: center;
+      transition: transform 0.15s ease;
     }
 
-    .metric-name {
-      color: var(--text-muted);
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
     }
 
-    .metric-value {
+    .kpi-card.amber::before {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    }
+
+    .kpi-card.emerald::before {
+      background: linear-gradient(90deg, #10b981, #34d399);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+    }
+
+    .kpi-caption {
+      font-size: 0.68rem;
       font-weight: 700;
-      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-400);
+      margin-bottom: 2px;
     }
 
-    /* Breakdown Bar */
-    .visual-breakdown {
-      margin-top: 14px;
+    .kpi-main-val {
+      font-size: 1.95rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
     }
 
-    .bar-label-header {
+    .kpi-main-val.amber {
+      color: var(--amber-400);
+      text-shadow: 0 0 18px rgba(245, 158, 11, 0.28);
+    }
+
+    .kpi-main-val.emerald {
+      color: var(--emerald-400);
+      text-shadow: 0 0 18px rgba(16, 185, 129, 0.28);
+    }
+
+    .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--text-400);
+      font-weight: 500;
+    }
+
+    /* Pace Strip */
+    .pace-ribbon {
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.14), rgba(56, 189, 248, 0.05));
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 9px;
+      padding: 7px 12px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+    }
+
+    .pace-title {
+      font-size: 0.76rem;
+      color: #bae6fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-weight: 600;
     }
 
-    .stacked-bar {
-      height: 12px;
-      border-radius: 999px;
+    .pace-val {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--cyan-400);
+      letter-spacing: -0.2px;
+    }
+
+    /* Mini KPI Grid (4 Metrics) */
+    .metrics-quad {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .quad-item {
+      background: rgba(8, 14, 28, 0.55);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .quad-label {
+      font-size: 0.66rem;
+      color: var(--text-500);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .quad-value {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--text-100);
+      margin-top: 1px;
+    }
+
+    .quad-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      color: var(--emerald-400);
+      margin-left: 3px;
+      font-weight: 700;
+    }
+
+    /* Revenue Distribution Bar */
+    .allocation-box {
+      background: rgba(8, 14, 28, 0.45);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9px;
+      padding: 8px 12px;
+    }
+
+    .alloc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .alloc-title {
+      color: var(--text-400);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .alloc-total {
+      color: var(--text-100);
+    }
+
+    .alloc-bar {
+      height: 9px;
+      border-radius: 99px;
       overflow: hidden;
       display: flex;
-      background: #334155;
-      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      margin-bottom: 6px;
     }
 
-    .bar-segment {
+    .alloc-slice {
       height: 100%;
-      transition: width 0.3s ease;
+      transition: width 0.25s ease;
     }
 
-    .bar-food-cost {
-      background: var(--accent-rose);
+    .slice-food {
+      background: var(--rose-400);
     }
 
-    .bar-fixed-cost {
-      background: var(--accent-amber);
+    .slice-fixed {
+      background: var(--amber-400);
     }
 
-    .bar-profit {
-      background: var(--accent-emerald);
+    .slice-profit {
+      background: var(--emerald-400);
     }
 
-    .bar-legend {
+    .alloc-legend {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 6px;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--text-400);
     }
 
-    .legend-item {
-      display: flex;
+    .legend-tag {
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
+      font-weight: 600;
     }
 
-    .legend-dot {
-      width: 8px;
-      height: 8px;
+    .dot {
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
     }
 
+    .dot-food { background: var(--rose-400); }
+    .dot-fixed { background: var(--amber-400); }
+    .dot-profit { background: var(--emerald-400); }
+
+    /* Footer Note (Ultra compact) */
     footer {
       text-align: center;
-      margin-top: 36px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      font-size: 0.7rem;
+      color: var(--text-500);
+      padding: 2px 0;
     }
 
-    @keyframes fadeIn {
+    @keyframes slideDown {
       from {
         opacity: 0;
         transform: translateY(-4px);
@@ -471,198 +580,228 @@
         transform: translateY(0);
       }
     }
+
+    /* Mobile Adaptations */
+    @media (max-width: 600px) {
+      body {
+        padding: 12px 10px;
+        height: auto;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .preset-strip {
+        width: 100%;
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="app-wrapper">
+
+    <!-- Header Section -->
     <header>
-      <div class="badge-icon">🚚 Food Truck Toolkit</div>
-      <h1>Daily Break-Even & Profit Calculator</h1>
-      <p class="subtitle">Calculate exactly how many meals you need to sell each day to cover your costs and hit your target profit.</p>
+      <div class="brand-group">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zm-.5 1.5l1.96 2.5H17V9.5h2.5zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        </div>
+        <div class="header-text">
+          <h1>Food Truck Break-Even & Profit Calculator</h1>
+          <p>Calculate exactly how many meals you need to sell each day to cover costs and hit your target profit.</p>
+        </div>
+      </div>
+
+      <!-- Quick Preset Controls -->
+      <div class="preset-strip">
+        <span class="preset-label">Presets:</span>
+        <button type="button" class="preset-pill active" id="btnPresetTaco" onclick="applyPreset('taco')">🌮 Taco Truck</button>
+        <button type="button" class="preset-pill" id="btnPresetBurger" onclick="applyPreset('burger')">🍔 Burger Rig</button>
+        <button type="button" class="preset-pill" id="btnPresetCoffee" onclick="applyPreset('coffee')">☕ Coffee Cart</button>
+        <button type="button" class="preset-pill reset-pill" onclick="resetForm()">↺ Reset</button>
+      </div>
     </header>
 
-    <!-- Presets bar for quick 1-click test scenarios -->
-    <div class="presets-container">
-      <span class="presets-label">Quick Scenarios:</span>
-      <button type="button" class="preset-btn" onclick="applyPreset('taco')">🌮 Taco Truck</button>
-      <button type="button" class="preset-btn" onclick="applyPreset('burger')">🍔 Burger Rig</button>
-      <button type="button" class="preset-btn" onclick="applyPreset('coffee')">☕ Coffee Cart</button>
-      <button type="button" class="preset-btn reset-btn" onclick="resetForm()">↺ Reset</button>
+    <!-- Friendly Error / Alert Message (Always pinned without scrolling) -->
+    <div id="alertBanner" class="alert-banner">
+      <span id="alertContent"></span>
     </div>
 
-    <!-- Alert / Friendly Error Box -->
-    <div id="alertBox" class="alert">
-      <span id="alertMessage"></span>
-    </div>
+    <!-- Central Dashboard Hub (Side by Side on Desktop) -->
+    <main class="central-hub">
 
-    <div class="grid-layout">
-      <!-- Input Column -->
-      <section class="card">
-        <h2 class="card-title">⚙️ Daily Costs & Pricing</h2>
+      <!-- LEFT: Inputs & Cost Parameters -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2>⚙️ Daily Operating Costs</h2>
+          <span class="panel-tag">Live Inputs</span>
+        </div>
 
         <form id="calculatorForm" autocomplete="off" onsubmit="event.preventDefault()">
-          
-          <div class="two-cols">
-            <div class="form-group">
-              <div class="label-row">
-                <label for="fixedOverhead">Daily Overhead</label>
+          <div class="form-grid">
+
+            <div class="input-card">
+              <div class="input-label-row">
+                <label for="fixedOverhead">Overhead</label>
+                <span class="input-badge">Daily</span>
               </div>
-              <div class="input-wrapper">
+              <div class="input-control">
                 <span class="input-prefix">$</span>
-                <input type="number" id="fixedOverhead" class="has-prefix" min="0" step="any" placeholder="150" value="150">
+                <input type="number" id="fixedOverhead" min="0" step="any" placeholder="150" value="150">
               </div>
-              <span class="hint">Gas, parking, prep kitchen fee</span>
+              <span class="input-subtext">Gas, commissary, permit, parking</span>
             </div>
 
-            <div class="form-group">
-              <div class="label-row">
-                <label for="dailyLabor">Daily Labor</label>
+            <div class="input-card">
+              <div class="input-label-row">
+                <label for="dailyLabor">Labor</label>
+                <span class="input-badge">Daily</span>
               </div>
-              <div class="input-wrapper">
+              <div class="input-control">
                 <span class="input-prefix">$</span>
-                <input type="number" id="dailyLabor" class="has-prefix" min="0" step="any" placeholder="100" value="100">
+                <input type="number" id="dailyLabor" min="0" step="any" placeholder="100" value="100">
               </div>
-              <span class="hint">Staff wages ($0 if solo)</span>
-            </div>
-          </div>
-
-          <div class="two-cols">
-            <div class="form-group">
-              <div class="label-row">
-                <label for="mealPrice">Meal Sale Price</label>
-              </div>
-              <div class="input-wrapper">
-                <span class="input-prefix">$</span>
-                <input type="number" id="mealPrice" class="has-prefix" min="0" step="any" placeholder="12.00" value="12.00">
-              </div>
-              <span class="hint">Avg. customer order price</span>
+              <span class="input-subtext">Staff wages ($0 if solo)</span>
             </div>
 
-            <div class="form-group">
-              <div class="label-row">
-                <label for="mealCost">Cost per Meal</label>
+            <div class="input-card">
+              <div class="input-label-row">
+                <label for="mealPrice">Meal Price</label>
+                <span class="input-badge">Average</span>
               </div>
-              <div class="input-wrapper">
+              <div class="input-control">
                 <span class="input-prefix">$</span>
-                <input type="number" id="mealCost" class="has-prefix" min="0" step="any" placeholder="3.50" value="3.50">
+                <input type="number" id="mealPrice" min="0" step="any" placeholder="12.00" value="12.00">
               </div>
-              <span class="hint">Ingredients & packaging</span>
+              <span class="input-subtext">Average ticket price per order</span>
             </div>
-          </div>
 
-          <div class="two-cols">
-            <div class="form-group">
-              <div class="label-row">
-                <label for="operatingHours">Service Hours</label>
+            <div class="input-card">
+              <div class="input-label-row">
+                <label for="mealCost">Meal Cost</label>
+                <span class="input-badge">Per Unit</span>
               </div>
-              <div class="input-wrapper">
-                <input type="number" id="operatingHours" class="has-suffix" min="1" max="24" step="0.5" placeholder="6" value="6">
+              <div class="input-control">
+                <span class="input-prefix">$</span>
+                <input type="number" id="mealCost" min="0" step="any" placeholder="3.50" value="3.50">
+              </div>
+              <span class="input-subtext">Food, beverage & packaging cost</span>
+            </div>
+
+            <div class="input-card">
+              <div class="input-label-row">
+                <label for="operatingHours">Hours Open</label>
+                <span class="input-badge">Service</span>
+              </div>
+              <div class="input-control">
+                <input type="number" id="operatingHours" min="0.5" max="24" step="0.5" placeholder="6" value="6">
                 <span class="input-suffix">hrs</span>
               </div>
-              <span class="hint">Hours truck is serving</span>
+              <span class="input-subtext">Hours serving customers</span>
             </div>
 
-            <div class="form-group">
-              <div class="label-row">
-                <label for="targetProfit">Target Daily Profit</label>
+            <div class="input-card">
+              <div class="input-label-row">
+                <label for="targetProfit">Profit Goal</label>
+                <span class="input-badge">Target</span>
               </div>
-              <div class="input-wrapper">
+              <div class="input-control">
                 <span class="input-prefix">$</span>
-                <input type="number" id="targetProfit" class="has-prefix" min="0" step="any" placeholder="200" value="200">
+                <input type="number" id="targetProfit" min="0" step="any" placeholder="200" value="200">
               </div>
-              <span class="hint">Your take-home goal</span>
+              <span class="input-subtext">Target daily take-home earnings</span>
             </div>
-          </div>
 
+          </div>
         </form>
       </section>
 
-      <!-- Output / Results Column -->
-      <section class="card">
-        <h2 class="card-title">📊 Your Daily Sales Targets</h2>
-
-        <div class="results-hero">
-          <div class="hero-stat-card break-even">
-            <div class="stat-label">To Break Even</div>
-            <div class="stat-number amber" id="breakEvenMeals">30</div>
-            <div class="stat-unit">meals needed</div>
-          </div>
-
-          <div class="hero-stat-card target-profit">
-            <div class="stat-label">To Reach Profit Goal</div>
-            <div class="stat-number emerald" id="targetMeals">53</div>
-            <div class="stat-unit">meals needed</div>
-          </div>
+      <!-- RIGHT: Instant KPI Targets & Breakdown -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2>📊 Target Milestones</h2>
+          <span class="panel-tag" id="statusBadge" style="color: var(--emerald-400);">Calculated</span>
         </div>
 
-        <div class="pace-banner" id="paceBanner">
-          <div class="pace-text">
-            Hourly Pace Needed for Goal:
-          </div>
-          <div class="pace-highlight" id="paceRate">
-            8.8 meals / hr
-          </div>
-        </div>
+        <div class="results-stack">
 
-        <div class="metrics-list">
-          <div class="metric-item">
-            <span class="metric-name">Contribution Margin per Meal</span>
-            <span class="metric-value" id="marginPerMeal">$8.50 (70.8%)</span>
-          </div>
-
-          <div class="metric-item">
-            <span class="metric-name">Total Fixed Overhead (Daily)</span>
-            <span class="metric-value" id="totalFixedCosts">$250.00</span>
-          </div>
-
-          <div class="metric-item">
-            <span class="metric-name">Break-Even Daily Revenue</span>
-            <span class="metric-value" id="breakEvenRevenue">$360.00</span>
-          </div>
-
-          <div class="metric-item">
-            <span class="metric-name">Target Goal Daily Revenue</span>
-            <span class="metric-value" id="targetRevenue">$636.00</span>
-          </div>
-        </div>
-
-        <div class="visual-breakdown">
-          <div class="bar-label-header">
-            <span>Where Target Revenue Goes:</span>
-            <span id="targetRevenueSum">$636.00</span>
-          </div>
-          <div class="stacked-bar">
-            <div id="barFood" class="bar-segment bar-food-cost" style="width: 29%;" title="Food & Packaging"></div>
-            <div id="barFixed" class="bar-segment bar-fixed-cost" style="width: 39%;" title="Fixed Overhead & Labor"></div>
-            <div id="barProfit" class="bar-segment bar-profit" style="width: 32%;" title="Net Profit"></div>
-          </div>
-          <div class="bar-legend">
-            <div class="legend-item">
-              <span class="legend-dot" style="background: var(--accent-rose)"></span>
-              <span>Food & Packaging (<span id="pctFood">29%</span>)</span>
+          <!-- Primary Hero Targets -->
+          <div class="hero-kpis">
+            <div class="kpi-card amber">
+              <div class="kpi-caption">Break-Even Point</div>
+              <div class="kpi-main-val amber" id="breakEvenMeals">30</div>
+              <div class="kpi-sub">meals cover all costs</div>
             </div>
-            <div class="legend-item">
-              <span class="legend-dot" style="background: var(--accent-amber)"></span>
-              <span>Fixed Overhead (<span id="pctFixed">39%</span>)</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-dot" style="background: var(--accent-emerald)"></span>
-              <span>Net Profit (<span id="pctProfit">32%</span>)</span>
+
+            <div class="kpi-card emerald">
+              <div class="kpi-caption">Profit Goal Target</div>
+              <div class="kpi-main-val emerald" id="targetMeals">53</div>
+              <div class="kpi-sub">meals hit target profit</div>
             </div>
           </div>
-        </div>
 
+          <!-- Hourly Pace Ribbon -->
+          <div class="pace-ribbon">
+            <div class="pace-title">
+              <span>⏱️</span>
+              <span>Required Pace for Target Goal:</span>
+            </div>
+            <div class="pace-val" id="paceRate">8.8 meals / hour</div>
+          </div>
+
+          <!-- Quad Financial Metrics -->
+          <div class="metrics-quad">
+            <div class="quad-item">
+              <span class="quad-label">Contribution Margin</span>
+              <span class="quad-value" id="marginPerMeal">$8.50 <span class="quad-badge" id="marginPctBadge">70.8%</span></span>
+            </div>
+            <div class="quad-item">
+              <span class="quad-label">Total Daily Fixed Costs</span>
+              <span class="quad-value" id="totalFixedCosts">$250.00</span>
+            </div>
+            <div class="quad-item">
+              <span class="quad-label">Break-Even Gross Revenue</span>
+              <span class="quad-value" id="breakEvenRevenue">$360.00</span>
+            </div>
+            <div class="quad-item">
+              <span class="quad-label">Target Goal Gross Revenue</span>
+              <span class="quad-value" id="targetRevenue">$636.00</span>
+            </div>
+          </div>
+
+          <!-- Visual Revenue Allocation Progress Bar -->
+          <div class="allocation-box">
+            <div class="alloc-header">
+              <span class="alloc-title">Target Revenue Allocation</span>
+              <span class="alloc-total" id="targetRevenueSum">$636.00</span>
+            </div>
+            <div class="alloc-bar">
+              <div id="barFood" class="alloc-slice slice-food" style="width: 29%;" title="Food Costs"></div>
+              <div id="barFixed" class="alloc-slice slice-fixed" style="width: 39%;" title="Fixed Costs"></div>
+              <div id="barProfit" class="alloc-slice slice-profit" style="width: 32%;" title="Net Profit"></div>
+            </div>
+            <div class="alloc-legend">
+              <span class="legend-tag"><span class="dot dot-food"></span>Food (<span id="pctFood">29%</span>)</span>
+              <span class="legend-tag"><span class="dot dot-fixed"></span>Fixed (<span id="pctFixed">39%</span>)</span>
+              <span class="legend-tag"><span class="dot dot-profit"></span>Profit (<span id="pctProfit">32%</span>)</span>
+            </div>
+          </div>
+
+        </div>
       </section>
-    </div>
 
+    </main>
+
+    <!-- Footer -->
     <footer>
-      Simple, standalone calculator &bull; Works offline &bull; No accounts or data collection required
+      Standalone local tool &bull; Zero external requests &bull; Real-time break-even engine
     </footer>
+
   </div>
 
   <script>
-    // Presets database
+    // Scenario presets
     const PRESETS = {
       taco: {
         fixedOverhead: 150,
@@ -690,7 +829,7 @@
       }
     };
 
-    // DOM Elements
+    // DOM References
     const fixedOverheadInput = document.getElementById('fixedOverhead');
     const dailyLaborInput = document.getElementById('dailyLabor');
     const mealPriceInput = document.getElementById('mealPrice');
@@ -698,8 +837,9 @@
     const operatingHoursInput = document.getElementById('operatingHours');
     const targetProfitInput = document.getElementById('targetProfit');
 
-    const alertBox = document.getElementById('alertBox');
-    const alertMessage = document.getElementById('alertMessage');
+    const alertBanner = document.getElementById('alertBanner');
+    const alertContent = document.getElementById('alertContent');
+    const statusBadge = document.getElementById('statusBadge');
 
     const breakEvenMealsEl = document.getElementById('breakEvenMeals');
     const targetMealsEl = document.getElementById('targetMeals');
@@ -725,18 +865,25 @@
     });
 
     function showAlert(type, title, message) {
-      alertBox.className = `alert alert-${type}`;
-      alertMessage.innerHTML = `<strong>${title}</strong>${message}`;
-      alertBox.style.display = 'block';
+      alertBanner.className = `alert-banner ${type}`;
+      alertContent.innerHTML = `<strong>${title}</strong>${message}`;
+      alertBanner.style.display = 'block';
+      if (statusBadge) {
+        statusBadge.textContent = 'Needs Attention';
+        statusBadge.style.color = type === 'error' ? 'var(--rose-400)' : 'var(--amber-400)';
+      }
     }
 
     function hideAlert() {
-      alertBox.style.display = 'none';
-      alertMessage.innerHTML = '';
+      alertBanner.style.display = 'none';
+      alertContent.innerHTML = '';
+      if (statusBadge) {
+        statusBadge.textContent = 'Optimized';
+        statusBadge.style.color = 'var(--emerald-400)';
+      }
     }
 
     function calculate() {
-      // Parse inputs
       const overhead = parseFloat(fixedOverheadInput.value) || 0;
       const labor = parseFloat(dailyLaborInput.value) || 0;
       const price = parseFloat(mealPriceInput.value);
@@ -744,28 +891,28 @@
       const hours = parseFloat(operatingHoursInput.value) || 1;
       const profit = parseFloat(targetProfitInput.value) || 0;
 
-      // Check for negative numbers
-      if (overhead < 0 || labor < 0 || (price !== undefined && price < 0) || (cost !== undefined && cost < 0) || hours < 0 || profit < 0) {
-        showAlert('error', '⚠️ Positive Numbers Only', 'Costs, prices, and hours should all be positive numbers (0 or higher).');
+      // Negative values guard
+      if (overhead < 0 || labor < 0 || (!isNaN(price) && price < 0) || (!isNaN(cost) && cost < 0) || hours < 0 || profit < 0) {
+        showAlert('error', '⚠️ Positive Values Only:', 'Costs, prices, and operating hours should be zero or greater.');
         setFallbackState();
         return;
       }
 
-      // Check for missing or zero price
+      // Missing or zero price
       if (isNaN(price) || price <= 0) {
-        showAlert('warning', '💡 Selling Price Needed', 'Please enter your average meal selling price to see how many meals you need to sell.');
+        showAlert('warning', '💡 Selling Price Needed:', 'Please input your average meal selling price to calculate break-even figures.');
         setFallbackState();
         return;
       }
 
       const validCost = isNaN(cost) ? 0 : cost;
 
-      // Check if cost exceeds or equals price
+      // Ingredient cost exceeding sale price
       if (validCost >= price) {
         showAlert(
           'error',
-          '🚨 Loss Warning: Food Cost Exceeds Selling Price',
-          `Your cost per meal (${currencyFmt.format(validCost)}) is higher than or equal to your sale price (${currencyFmt.format(price)}). Every meal sold loses money! Increase your price or lower your ingredient costs to break even.`
+          '🚨 Loss Alert:',
+          `Food cost (${currencyFmt.format(validCost)}) is greater than or equal to selling price (${currencyFmt.format(price)}). Each order generates a loss! Increase meal price or lower food cost.`
         );
         setFallbackState();
         return;
@@ -773,7 +920,7 @@
 
       hideAlert();
 
-      // Math calculations
+      // Calculation logic
       const totalFixed = overhead + labor;
       const contributionMargin = price - validCost;
       const marginPercent = ((contributionMargin / price) * 100).toFixed(1);
@@ -787,18 +934,18 @@
       const breakEvenRev = breakEvenMeals * price;
       const targetRev = targetMeals * price;
 
-      // Update text outputs
+      // Render Text Results
       breakEvenMealsEl.textContent = breakEvenMeals.toLocaleString();
       targetMealsEl.textContent = targetMeals.toLocaleString();
       paceRateEl.textContent = `${pacePerHour} meals / hr`;
 
-      marginPerMealEl.textContent = `${currencyFmt.format(contributionMargin)} (${marginPercent}%)`;
+      marginPerMealEl.innerHTML = `${currencyFmt.format(contributionMargin)} <span class="quad-badge" style="color: var(--emerald-400); font-weight:700;">${marginPercent}%</span>`;
       totalFixedCostsEl.textContent = currencyFmt.format(totalFixed);
       breakEvenRevenueEl.textContent = currencyFmt.format(breakEvenRev);
       targetRevenueEl.textContent = currencyFmt.format(targetRev);
       targetRevenueSumEl.textContent = currencyFmt.format(targetRev);
 
-      // Visual Breakdown percentages based on target revenue
+      // Render Distribution Bar
       if (targetRev > 0) {
         const totalFoodCost = targetMeals * validCost;
         const foodPct = Math.round((totalFoodCost / targetRev) * 100);
@@ -813,12 +960,12 @@
         pctFixed.textContent = `${fixedPct}%`;
         pctProfit.textContent = `${profitPct}%`;
       } else {
-        barFood.style.width = `0%`;
-        barFixed.style.width = `0%`;
-        barProfit.style.width = `0%`;
-        pctFood.textContent = `0%`;
-        pctFixed.textContent = `0%`;
-        pctProfit.textContent = `0%`;
+        barFood.style.width = '0%';
+        barFixed.style.width = '0%';
+        barProfit.style.width = '0%';
+        pctFood.textContent = '0%';
+        pctFixed.textContent = '0%';
+        pctProfit.textContent = '0%';
       }
     }
 
@@ -835,6 +982,13 @@
       barProfit.style.width = '0%';
     }
 
+    function highlightPresetButton(activeKey) {
+      document.querySelectorAll('.preset-pill').forEach(btn => btn.classList.remove('active'));
+      if (activeKey === 'taco') document.getElementById('btnPresetTaco')?.classList.add('active');
+      if (activeKey === 'burger') document.getElementById('btnPresetBurger')?.classList.add('active');
+      if (activeKey === 'coffee') document.getElementById('btnPresetCoffee')?.classList.add('active');
+    }
+
     function applyPreset(name) {
       const data = PRESETS[name];
       if (!data) return;
@@ -846,6 +1000,7 @@
       operatingHoursInput.value = data.operatingHours;
       targetProfitInput.value = data.targetProfit;
 
+      highlightPresetButton(name);
       calculate();
     }
 
@@ -856,24 +1011,25 @@
       mealCostInput.value = '';
       operatingHoursInput.value = '6';
       targetProfitInput.value = '';
+      highlightPresetButton(null);
       calculate();
     }
 
-    // Attach real-time input event listeners
-    const inputs = [
+    // Attach listeners
+    [
       fixedOverheadInput,
       dailyLaborInput,
       mealPriceInput,
       mealCostInput,
       operatingHoursInput,
       targetProfitInput
-    ];
-
-    inputs.forEach(input => {
-      input.addEventListener('input', calculate);
+    ].forEach(input => {
+      input.addEventListener('input', () => {
+        highlightPresetButton(null);
+        calculate();
+      });
     });
 
-    // Run initial calculation on page load
     window.addEventListener('DOMContentLoaded', calculate);
   </script>
 </body>
